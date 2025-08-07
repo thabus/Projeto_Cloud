@@ -2,8 +2,15 @@
 
 ## Índice
 - [INTRODUÇÃO](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#1-introdu%C3%A7%C3%A3o)
+  - [Descrição Geral do Sistema](https://github.com/thabus/Projeto_Cloud#11-descri%C3%A7%C3%A3o-geral-do-sistema)
+  - [Objetivos do Projeto](https://github.com/thabus/Projeto_Cloud#12-objetivos-do-projeto)
 - [VISÃO GERAL DA ARQUITETURA](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#2-visão-geral-da-arquitetura)
+  - [Descrição da Arquitetura em alto nível](https://github.com/thabus/Projeto_Cloud#21-descri%C3%A7%C3%A3o-da-arquitetura-em-alto-n%C3%ADvel)
+  - [Tecnologias e Padrões Utilizados](https://github.com/thabus/Projeto_Cloud#22-tecnologias-e-padr%C3%B5es-utilizados)
 - [REQUISITOS E RESTRIÇÕES ARQUITETURAIS](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#3-requisitos-e-restri%C3%A7%C3%B5es-arquiterurais)
+  - [Requisitos Funcionais](https://github.com/thabus/Projeto_Cloud#31-requisitos-funcionais)
+  - [Requisitos Não Funcionais](https://github.com/thabus/Projeto_Cloud#32-requisitos-n%C3%A3o-funcionais)
+  - [Restrições](https://github.com/thabus/Projeto_Cloud#33-restri%C3%A7%C3%B5es)
 
 <br>
 
@@ -71,13 +78,60 @@ O sistema utiliza um conjunto de tecnologias e padrões de arquitetura modernos 
 - **R06: Ferramenta de Ingestão:** A simulação da extração e envio de arquivos para a nuvem deve ser realizada por meio de um Container Docker. 
 - **R07: Ferramenta de Automação de Alertas:** A automação de notificações e a integração com outros serviços devem ser feitas com Logic Apps. 
 
+<br>
+
+## 4. Casos de Uso
+
+### 4.1. Casos de Uso do Sistema
+
+**Caso de Uso 1: Processar Pipeline de Dados de Cotações**
+- Nome do Caso de Uso: Processar Pipeline de Dados de Cotações
+- Ator Principal: Sistema (de forma automatizada)
+- Ator Secundário: Desenvolvedor/Operador
+- Descrição: Descreve o fluxo ponta-a-ponta, totalmente automatizado, para processar um arquivo de cotação desde sua chegada na nuvem até a carga final no banco de dados e a notificação do resultado.
+- Pré-condições:
+   - A infraestrutura na Azure (Storage, Data Factory, Function, SQL DB, Logic Apps) está devidamente configurada.
+   - Um novo arquivo de cotações foi depositado na área de dados brutos do Azure Storage Account.
+- **Fluxo Principal (Caminho Feliz):**
+   1. A chegada de um novo arquivo no Azure Storage aciona o pipeline no Azure Data Factory para iniciar o processamento.
+   2. O pipeline lê o arquivo bruto, aplica as transformações para limpar e estruturar os dados e salva o resultado como um novo arquivo na área de dados processados.
+   3. Ao término da etapa de transformação, o Data Factory aciona a Azure Function.
+   4. A Azure Function lê o arquivo processado e realiza a carga incremental dos novos dados na tabela `Cotacoes` do Azure SQL Database.
+   5. Ao final da execução bem-sucedida do pipeline, a Logic App é acionada.
+   6. A Logic App envia um e-mail de "Sucesso" para o Desenvolvedor/Operador.
+ - **Fluxo de Exceção:**
+   1. Se ocorrer um erro em qualquer etapa do pipeline do Data Factory (transformação ou carga), a execução é interrompida.
+   2. A Logic App configurada para monitorar falhas é acionada.
+   3. A Logic App envia um e-mail de "Falha" para o Desenvolvedor/Operador, informando sobre o erro.
+- Pós-condições:
+   - Em caso de sucesso, os novos dados de cotações estão disponíveis para consulta no Azure SQL Database.
+   - O Desenvolvedor/Operador recebe um e-mail informando o status final (sucesso ou falha) da execução do pipeline.
+
+
+**Caso de Uso 2: Ingerir Arquivo de Cotações**
+- Nome do Caso de Uso: Ingerir Arquivo de Cotações
+- Ator Principal: Desenvolvedor
+- Descrição: Detalha o processo manual de simulação da extração e envio de um arquivo de cotações para a nuvem, que serve como gatilho para o "Caso de Uso 1".
+- Pré-condições:
+   - O container Docker está devidamente configurado e pronto para ser executado.
+   - O Azure Storage Account está criado e acessível.
+- **Fluxo Principal:**
+    1.  O Desenvolvedor/Operador executa o container Docker.
+    2.  O script dentro do container realiza o envio de um ou mais arquivos de cotações para o container de dados brutos no Azure Blob Storage.
+- **Fluxo de Exceção:**
+    1. Se o container Docker não conseguir ser executado (ex: erro de configuração do Docker na máquina local), o processo falha e uma mensagem de erro é exibida no terminal do Desenvolvedor.
+    2. Se o script dentro do container não conseguir se conectar ao Azure Storage (ex: chave de acesso incorreta, falta de permissão, problema de rede), o script termina com um erro e o arquivo não é enviado.
+- Pós-condições:
+   - Sucesso: O arquivo de cotações está armazenado na área de dados brutos da nuvem, pronto para acionar o pipeline de processamento.
+   - Falha: O arquivo não é enviado para a nuvem e o pipeline principal não é acionado. Uma mensagem de erro é registrada localmente.
+
+
+**Caso de Uso 3: Analisar Dados de Cotações**
+- Nome do Caso de Uso: Analisar Dados de Cotações
 
 
 
 
-
-
-
-
+<br>
 
 *Grupo: Thaís Bustamante e Emily*
