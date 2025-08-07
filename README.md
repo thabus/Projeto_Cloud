@@ -11,6 +11,7 @@
   - [Requisitos Funcionais](https://github.com/thabus/Projeto_Cloud#31-requisitos-funcionais)
   - [Requisitos Não Funcionais](https://github.com/thabus/Projeto_Cloud#32-requisitos-n%C3%A3o-funcionais)
   - [Restrições](https://github.com/thabus/Projeto_Cloud#33-restri%C3%A7%C3%B5es)
+- [CASOS DE USO](https://github.com/thabus/Projeto_Cloud?tab=readme-ov-file#4-casos-de-uso)
 
 <br>
 
