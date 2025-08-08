@@ -9,6 +9,7 @@
   - [Requisitos Não Funcionais](https://github.com/thabus/Projeto_Cloud#32-requisitos-n%C3%A3o-funcionais)
   - [Restrições](https://github.com/thabus/Projeto_Cloud#33-restri%C3%A7%C3%B5es)
 - [CASOS DE USO](https://github.com/thabus/Projeto_Cloud?tab=readme-ov-file#4-casos-de-uso)
+  - [Casos de Uso do Sistema]
 - [VISÃO GERAL DA ARQUITETURA](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#2-visão-geral-da-arquitetura)
   - [Descrição da Arquitetura em alto nível](https://github.com/thabus/Projeto_Cloud#21-descri%C3%A7%C3%A3o-da-arquitetura-em-alto-n%C3%ADvel)
   - [Tecnologias e Padrões Utilizados](https://github.com/thabus/Projeto_Cloud#22-tecnologias-e-padr%C3%B5es-utilizados)
@@ -127,8 +128,17 @@ O principal objetivo é criar uma arquitetura de nuvem robusta e automatizada. O
 
 ### 3.2. Diagrama de Classes
 
-![Diagrama de Classes do Projeto](https://www.mermaidchart.com/app/projects/1dbf83d3-7cb5-4698-b822-ef9d289c4e91/diagrams/81ab2952-df1a-437a-90b5-7039ef5cfe19/version/v0.1/edit)
+![Diagrama de Classes do Projeto](https://github.com/thabus/Projeto_Cloud/blob/main/diagrama_de_classes.png)
 
+### 3.3 Detalhamento dos Componentes e Relacionamentos do Diagrama
+
+- **Cotacao:** É a classe que modela os dados de cotações processados . Ela é o destino final do nosso pipeline de dados.
+- **DockerContainer:** Componente responsável por iniciar o fluxo. Sua função é `enviarArquivoBruto()` para o Azure Storage.
+- **AzureStorageAccount:** Atua como repositório central (Data Lake). Armazena os arquivos brutos e os processados, além de acionar a Azure Function quando um novo arquivo processado chega.
+- **AzureDataFactory:** O orquestrador do ETL. Ele lê os dados brutos, executa a transformação e salva o resultado no Storage.
+- **AzureFunction:** Componente serverless que contém a lógica de negócio para a carga. Ele é acionado (`trigger`) pela chegada de um arquivo no Storage, lê esse arquivo e o carrega no banco de dados.
+- **AzureSqlDatabase:** O banco de dados relacional que armazena permanentemente os objetos da classe `Cotacao`. A relação "1 para muitos" indica que o banco armazena múltiplas cotações.
+- **LogicApps:** Responsável pela automação de alertas. Ele monitora o status do `AzureDataFactory` e envia notificações, desacoplando a lógica de alerta do pipeline principal.
 
 <br>
 
