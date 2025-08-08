@@ -4,14 +4,14 @@
 - [INTRODUÇÃO](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#1-introdu%C3%A7%C3%A3o)
   - [Descrição Geral do Sistema](https://github.com/thabus/Projeto_Cloud#11-descri%C3%A7%C3%A3o-geral-do-sistema)
   - [Objetivos do Projeto](https://github.com/thabus/Projeto_Cloud#12-objetivos-do-projeto)
-- [VISÃO GERAL DA ARQUITETURA](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#2-visão-geral-da-arquitetura)
-  - [Descrição da Arquitetura em alto nível](https://github.com/thabus/Projeto_Cloud#21-descri%C3%A7%C3%A3o-da-arquitetura-em-alto-n%C3%ADvel)
-  - [Tecnologias e Padrões Utilizados](https://github.com/thabus/Projeto_Cloud#22-tecnologias-e-padr%C3%B5es-utilizados)
 - [REQUISITOS E RESTRIÇÕES ARQUITETURAIS](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#3-requisitos-e-restri%C3%A7%C3%B5es-arquiterurais)
   - [Requisitos Funcionais](https://github.com/thabus/Projeto_Cloud#31-requisitos-funcionais)
   - [Requisitos Não Funcionais](https://github.com/thabus/Projeto_Cloud#32-requisitos-n%C3%A3o-funcionais)
   - [Restrições](https://github.com/thabus/Projeto_Cloud#33-restri%C3%A7%C3%B5es)
 - [CASOS DE USO](https://github.com/thabus/Projeto_Cloud?tab=readme-ov-file#4-casos-de-uso)
+- [VISÃO GERAL DA ARQUITETURA](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#2-visão-geral-da-arquitetura)
+  - [Descrição da Arquitetura em alto nível](https://github.com/thabus/Projeto_Cloud#21-descri%C3%A7%C3%A3o-da-arquitetura-em-alto-n%C3%ADvel)
+  - [Tecnologias e Padrões Utilizados](https://github.com/thabus/Projeto_Cloud#22-tecnologias-e-padr%C3%B5es-utilizados)
 
 <br>
 
@@ -28,32 +28,9 @@ O principal objetivo é criar uma arquitetura de nuvem robusta e automatizada. O
 
 <br>
 
-## 2. Visão Geral da Arquitetura
+## 2. Requisitos e Restrições Arquiterurais
 
-### 2.1. Descrição da arquitetura em alto nível
-A arquitetura do sistema é desenhada como um pipeline de dados moderno e automatizado, implementado inteiramente na nuvem Microsoft Azure. O projeto segue o padrão de **ETL** para processar arquivos de cotações da B3, desde sua ingestão até o armazenamento em um banco de dados relacional para análise.
-O fluxo arquitetural pode ser resumido em três fases principais:
- - 1. Extração (Extract): O processo é iniciado pela ingestão de dados, simulada por um **Container Docker**. Este container envia os arquivos brutos de cotações para um repositório central no **Azure Storage Account**.
- - 2. Transformação (Transform): O **Azure Data Factory** atua como o orquestrador central do pipeline. Ele é responsável por ler os arquivos brutos do Storage, aplicar as transformações necessárias para limpar e estruturar os dados e, em seguida, salvar os arquivos processados de volta no Azure Storage Account.
- - 3. Carga (Load): Nesta fase, uma **Azure Function** é acionada automaticamente. Utilizando um padrão de computação *serverless*, a função realiza uma carga incremental dos dados processados diretamente no **Azure SQL Database**, que serve como o banco de dados analítico final.
-
-Adicionalmente, o **Logic Apps** é utilizado para automatizar notificações e alertas, como o envio de e-mails sobre o status da execução do pipeline, e para integrar o fluxo com serviços de visualização, como o Power BI.
-
-### 2.2. Tecnologias e padrões utilizados
-
-O sistema utiliza um conjunto de tecnologias e padrões de arquitetura modernos para garantir automação, escalabilidade e manutenibilidade.
-- *Padrão de Pipeline de Dados (ETL)*: A arquitetura inteira é baseada no padrão de ETL, onde os dados passam por estágios distintos de extração, transformação e carga, orquestrados pelo Azure Data Factory.
-- *Computação Serverless (Serverless Computing)*: Este padrão é implementado com a Azure Function para a carga de dados no banco. A abordagem permite executar a lógica de carga de forma reativa e escalável, sem a necessidade de gerenciar a infraestrutura de servidores.
-- *Contêineres (Containers)*: O uso do Docker para simular a ingestão de arquivos representa o padrão de conteinerização. Isso encapsula a aplicação de ingestão e suas dependências, garantindo consistência e portabilidade.
-- *Automação e Orquestração*: A automação é um pilar do projeto. O Azure Data Factory orquestra o fluxo de dados principal , enquanto o Logic Apps automatiza tarefas secundárias, como o envio de notificações e a integração entre serviços.
-- *Banco de Dados como Serviço (DBaaS)*: O Azure SQL Database é utilizado como um serviço de banco de dados gerenciado em nuvem, eliminando a necessidade de administração de um servidor de banco de dados tradicional.
-- *Data Lake*: O Azure Storage Account funciona como um Data Lake, um repositório centralizado para armazenar grandes volumes de dados em seus formatos nativos (brutos) e processados.
-
-<br>
-
-## 3. Requisitos e Restrições Arquiterurais
-
-### 3.1. Requisitos Funcionais
+### 2.1. Requisitos Funcionais
 - **RF01: Ingestão de Dados:** O sistema deve ter a capacidade de simular a extração de arquivos diários de cotações da B3 e enviá-los para o Azure Blob Storage.
 - **RF02: Armazenamento de Arquivos:** O sistema deve armazenar os arquivos brutos (originais) e os arquivos já processados em um Azure Storage Account.
 - **RF03: Transformação de Dados:** O sistema deve possuir um pipeline ETL para transformar os dados brutos em um formato estruturado e limpo, adequado para análise posterior.
@@ -64,13 +41,13 @@ O sistema utiliza um conjunto de tecnologias e padrões de arquitetura modernos 
 - **RF08: Disponibilização para Análise:** Os dados finais armazenados no banco de dados devem estar disponíveis para serem consumidos por ferramentas de visualização, como Power BI ou Synapse Analytics.
 
 
-### 3.2. Requisitos Não Funcionais
+### 2.2. Requisitos Não Funcionais
 - **RNF01: Escalabilidade:** A arquitetura deve ser projetada para suportar o processamento e a análise de dados em larga escala, conforme o objetivo educacional do projeto.
 - **RNF02: Automação de Pipeline:** Todo o fluxo de dados, desde a ingestão até a carga final, deve ser automatizado para minimizar a necessidade de intervenção manual.
 - **RNF03: Entregáveis Específicos:** O projeto deve resultar em um conjunto de entregáveis bem definidos, incluindo um documento de arquitetura, o pipeline do Data Factory, o código da Azure Function, o container Docker, a Logic App e os scripts SQL necessários.
 
 
-### 3.3. Restrições
+### 2.3. Restrições
 - **R01: Plataforma Cloud:** Toda a solução deve ser obrigatoriamente construída e hospedada na nuvem da Microsoft Azure. 
 - **R02: Ferramenta de Orquestração:** O pipeline de ETL deve ser implementado exclusivamente com o Azure Data Factory. 
 - **R03: Tecnologia de Carga de Dados:** A lógica para a carga incremental de dados no banco de dados deve ser desenvolvida utilizando Azure Function (Serverless). 
@@ -81,9 +58,9 @@ O sistema utiliza um conjunto de tecnologias e padrões de arquitetura modernos 
 
 <br>
 
-## 4. Casos de Uso
+## 3. Casos de Uso
 
-### 4.1. Casos de Uso do Sistema
+### 3.1. Casos de Uso do Sistema
 
 **Caso de Uso 1: Processar Pipeline de Dados de Cotações**
 - Nome do Caso de Uso: Processar Pipeline de Dados de Cotações
@@ -129,10 +106,55 @@ O sistema utiliza um conjunto de tecnologias e padrões de arquitetura modernos 
 
 **Caso de Uso 3: Analisar Dados de Cotações**
 - Nome do Caso de Uso: Analisar Dados de Cotações
+- Ator Principal: Analista de Dados
+- Descrição: Mostra como um usuário final consome os dados já processados pelo pipeline para criar visualizações e gerar insights.
+- Pré-condições:
+    - O "Caso de Uso 1" foi executado com sucesso pelo menos uma vez.
+    - Os dados de cotações estão armazenados no Azure SQL Database.
+    - O Analista de Dados possui uma ferramenta de visualização (como Power BI) com as credenciais de acesso ao banco de dados.
+- **Fluxo Principal:**
+   1. O Analista de Dados utiliza uma ferramenta de visualização, como Power BI ou Synapse Analytics.
+   2. O Analista estabelece uma conexão com a base de dados Azure SQL Database que contém as cotações processadas.
+   3. O Analista cria relatórios e dashboards para analisar os dados.
+- **Fluxo de Exceção:**
+    1. Se a ferramenta de visualização não conseguir se conectar ao Azure SQL Database (ex: credenciais inválidas, firewall bloqueando a conexão, banco de dados offline), uma mensagem de erro de conexão é exibida para o Analista na própria ferramenta.
+    2. Se uma consulta (query) executada pela ferramenta no banco de dados for inválida, o banco retornará um erro que será exibido na ferramenta de visualização.
+- Pós-condições:
+    - Sucesso: As informações das cotações são apresentadas de forma visual, permitindo a análise.
+    - Falha: O Analista de Dados não consegue acessar os dados e recebe uma mensagem de erro, precisando corrigir o problema de conexão ou da consulta para continuar. 
 
 
+
+### 3.2. Diagrama de Classes
+
+![Diagrama de Classes do Projeto](https://www.mermaidchart.com/app/projects/1dbf83d3-7cb5-4698-b822-ef9d289c4e91/diagrams/81ab2952-df1a-437a-90b5-7039ef5cfe19/version/v0.1/edit)
 
 
 <br>
 
-*Grupo: Thaís Bustamante e Emily*
+
+## 4. Visão Geral da Arquitetura
+
+### 4.1. Descrição da arquitetura em alto nível
+A arquitetura do sistema é desenhada como um pipeline de dados moderno e automatizado, implementado inteiramente na nuvem Microsoft Azure. O projeto segue o padrão de **ETL** para processar arquivos de cotações da B3, desde sua ingestão até o armazenamento em um banco de dados relacional para análise.
+O fluxo arquitetural pode ser resumido em três fases principais:
+ - 1. Extração (Extract): O processo é iniciado pela ingestão de dados, simulada por um **Container Docker**. Este container envia os arquivos brutos de cotações para um repositório central no **Azure Storage Account**.
+ - 2. Transformação (Transform): O **Azure Data Factory** atua como o orquestrador central do pipeline. Ele é responsável por ler os arquivos brutos do Storage, aplicar as transformações necessárias para limpar e estruturar os dados e, em seguida, salvar os arquivos processados de volta no Azure Storage Account.
+ - 3. Carga (Load): Nesta fase, uma **Azure Function** é acionada automaticamente. Utilizando um padrão de computação *serverless*, a função realiza uma carga incremental dos dados processados diretamente no **Azure SQL Database**, que serve como o banco de dados analítico final.
+
+Adicionalmente, o **Logic Apps** é utilizado para automatizar notificações e alertas, como o envio de e-mails sobre o status da execução do pipeline, e para integrar o fluxo com serviços de visualização, como o Power BI.
+
+### 4.2. Tecnologias e padrões utilizados
+
+O sistema utiliza um conjunto de tecnologias e padrões de arquitetura modernos para garantir automação, escalabilidade e manutenibilidade.
+- *Padrão de Pipeline de Dados (ETL)*: A arquitetura inteira é baseada no padrão de ETL, onde os dados passam por estágios distintos de extração, transformação e carga, orquestrados pelo Azure Data Factory.
+- *Computação Serverless (Serverless Computing)*: Este padrão é implementado com a Azure Function para a carga de dados no banco. A abordagem permite executar a lógica de carga de forma reativa e escalável, sem a necessidade de gerenciar a infraestrutura de servidores.
+- *Contêineres (Containers)*: O uso do Docker para simular a ingestão de arquivos representa o padrão de conteinerização. Isso encapsula a aplicação de ingestão e suas dependências, garantindo consistência e portabilidade.
+- *Automação e Orquestração*: A automação é um pilar do projeto. O Azure Data Factory orquestra o fluxo de dados principal , enquanto o Logic Apps automatiza tarefas secundárias, como o envio de notificações e a integração entre serviços.
+- *Banco de Dados como Serviço (DBaaS)*: O Azure SQL Database é utilizado como um serviço de banco de dados gerenciado em nuvem, eliminando a necessidade de administração de um servidor de banco de dados tradicional.
+- *Data Lake*: O Azure Storage Account funciona como um Data Lake, um repositório centralizado para armazenar grandes volumes de dados em seus formatos nativos (brutos) e processados.
+
+
+<br>
+
+<h4>Grupo: Thaís Bustamante e Emily</h4>
