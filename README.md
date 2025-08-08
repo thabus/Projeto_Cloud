@@ -1,6 +1,6 @@
 # Pipeline Cloud para Análise de Cotações da B3 com Azure
-
-## Índice
+ 
+## :bookmark_tabs:  Índice 
 - [INTRODUÇÃO](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#1-introdu%C3%A7%C3%A3o)
   - [Descrição Geral do Sistema](https://github.com/thabus/Projeto_Cloud#11-descri%C3%A7%C3%A3o-geral-do-sistema)
   - [Objetivos do Projeto](https://github.com/thabus/Projeto_Cloud#12-objetivos-do-projeto)
@@ -18,7 +18,7 @@
 
 <br>
 
-## 1. Introdução
+##  :pushpin: 1. Introdução
 
 ### 1.1. Descrição Geral do Sistema
 Esse é um sistema em nuvem na plataforma Azure, projetado para a análise de cotações da Bolsa de Valores do Brasil (B3). O projeto aborda o desafio de processar os arquivos de cotações diárias disponibilizados pela B3, que contêm informações como código do ativo, data, preços de abertura, máximo, mínimo, fechamento e volume financeiro. A solução propõe um pipeline de dados completo para extrair, transformar, carregar (ETL) e analisar esses dados em larga escala, resultando na disponibilização das informações para consumo em dashboards analíticos.
@@ -31,7 +31,7 @@ O principal objetivo é criar uma arquitetura de nuvem robusta e automatizada. O
 
 <br>
 
-## 2. Requisitos e Restrições Arquiterurais
+## :memo: 2. Requisitos e Restrições Arquiterurais
 
 ### 2.1. Requisitos Funcionais
 - **RF01: Ingestão de Dados:** O sistema deve ter a capacidade de simular a extração de arquivos diários de cotações da B3 e enviá-los para o Azure Blob Storage.
@@ -61,7 +61,7 @@ O principal objetivo é criar uma arquitetura de nuvem robusta e automatizada. O
 
 <br>
 
-## 3. Casos de Uso
+## :open_file_folder: 3. Casos de Uso
 
 ### 3.1. Casos de Uso do Sistema
 
@@ -145,7 +145,7 @@ O principal objetivo é criar uma arquitetura de nuvem robusta e automatizada. O
 <br>
 
 
-## 4. Visão Geral da Arquitetura
+## :triangular_ruler: 4. Visão Geral da Arquitetura
 
 ### 4.1. Descrição da arquitetura em alto nível
 A arquitetura do sistema é desenhada como um pipeline de dados moderno e automatizado, implementado inteiramente na nuvem Microsoft Azure. O projeto segue o padrão de **ETL** para processar arquivos de cotações da B3, desde sua ingestão até o armazenamento em um banco de dados relacional para análise.
