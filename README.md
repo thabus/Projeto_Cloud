@@ -158,15 +158,16 @@ Adicionalmente, o **Logic Apps** é utilizado para automatizar notificações e 
 
 ### 4.2. Tecnologias e padrões utilizados
 
-O sistema utiliza um conjunto de tecnologias e padrões de arquitetura modernos para garantir automação, escalabilidade e manutenibilidade.
-- *Padrão de Pipeline de Dados (ETL)*: A arquitetura inteira é baseada no padrão de ETL, onde os dados passam por estágios distintos de extração, transformação e carga, orquestrados pelo Azure Data Factory.
-- *Computação Serverless (Serverless Computing)*: Este padrão é implementado com a Azure Function para a carga de dados no banco. A abordagem permite executar a lógica de carga de forma reativa e escalável, sem a necessidade de gerenciar a infraestrutura de servidores.
-- *Contêineres (Containers)*: O uso do Docker para simular a ingestão de arquivos representa o padrão de conteinerização. Isso encapsula a aplicação de ingestão e suas dependências, garantindo consistência e portabilidade.
-- *Automação e Orquestração*: A automação é um pilar do projeto. O Azure Data Factory orquestra o fluxo de dados principal , enquanto o Logic Apps automatiza tarefas secundárias, como o envio de notificações e a integração entre serviços.
-- *Banco de Dados como Serviço (DBaaS)*: O Azure SQL Database é utilizado como um serviço de banco de dados gerenciado em nuvem, eliminando a necessidade de administração de um servidor de banco de dados tradicional.
-- *Data Lake*: O Azure Storage Account funciona como um Data Lake, um repositório centralizado para armazenar grandes volumes de dados em seus formatos nativos (brutos) e processados.
+| **Tecnologia / Padrão**                 | **Função no Projeto**                                                                                                        |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Padrão de Pipeline de Dados (ETL)**   | Estrutura o fluxo em três etapas (Extração, Transformação e Carga) orquestradas pelo Azure Data Factory.                     |
+| **Computação Serverless**               | Implementada com Azure Function para a carga incremental no banco, permitindo execução sob demanda sem gerenciar servidores. |
+| **Contêineres (Docker)**                | Utilizados para simular a ingestão de arquivos, encapsulando dependências e garantindo portabilidade.                        |
+| **Automação e Orquestração**            | Azure Data Factory gerencia o fluxo principal, enquanto Logic Apps automatiza notificações e integra serviços.               |
+| **Banco de Dados como Serviço (DBaaS)** | Azure SQL Database armazena os dados processados, eliminando a necessidade de administrar servidores.                        |
+| **Data Lake**                           | Azure Storage Account centraliza o armazenamento de arquivos brutos e processados.                                           |
 
 
 <br>
 
-<h4>Grupo: Thaís Bustamante e Emily</h4>
+<h4>Grupo: Thaís Bustamante e Emilly Fernandes</h4>
