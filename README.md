@@ -1,18 +1,18 @@
 # Pipeline Cloud para Análise de Cotações da B3 com Azure
  
 ## 📑 Índice
-- [📖 Introdução](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#1-introdu%C3%A7%C3%A3o)
+- [:pushpin: Introdução](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#1-introdu%C3%A7%C3%A3o)
   - [ℹ️ Descrição Geral do Sistema](https://github.com/thabus/Projeto_Cloud#11-descri%C3%A7%C3%A3o-geral-do-sistema)
   - [🎯 Objetivos do Projeto](https://github.com/thabus/Projeto_Cloud#12-objetivos-do-projeto)
-- [⚙️ Requisitos e Restrições Arquiteturais](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#3-requisitos-e-restri%C3%A7%C3%B5es-arquiterurais)
+- [:memo: Requisitos e Restrições Arquiteturais](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#3-requisitos-e-restri%C3%A7%C3%B5es-arquiterurais)
   - [🛠️ Requisitos Funcionais](https://github.com/thabus/Projeto_Cloud#31-requisitos-funcionais)
   - [📏 Requisitos Não Funcionais](https://github.com/thabus/Projeto_Cloud#32-requisitos-n%C3%A3o-funcionais)
   - [⛔ Restrições](https://github.com/thabus/Projeto_Cloud#33-restri%C3%A7%C3%B5es)
-- [📝 Casos de Uso](https://github.com/thabus/Projeto_Cloud?tab=readme-ov-file#4-casos-de-uso)
+- [:open_file_folder: Casos de Uso](https://github.com/thabus/Projeto_Cloud?tab=readme-ov-file#4-casos-de-uso)
   - [📌 Casos de Uso do Sistema](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#31-casos-de-uso-do-sistema)
   - [📊 Diagrama de Classes](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#32-diagrama-de-classes)
   - [🔍 Detalhamento dos Componentes e Relacionamentos](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#33-detalhamento-dos-componentes-e-relacionamentos-do-diagrama)
-- [🏗️ Visão Geral da Arquitetura](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#2-visão-geral-da-arquitetura)
+- [:triangular_ruler: Visão Geral da Arquitetura](https://github.com/thabus/Projeto_Cloud/blob/main/README.md#2-visão-geral-da-arquitetura)
   - [🖼️ Descrição da Arquitetura em Alto Nível](https://github.com/thabus/Projeto_Cloud#21-descri%C3%A7%C3%A3o-da-arquitetura-em-alto-n%C3%ADvel)
   - [💻 Tecnologias e Padrões Utilizados](https://github.com/thabus/Projeto_Cloud#22-tecnologias-e-padr%C3%B5es-utilizados)
 
