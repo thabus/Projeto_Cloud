@@ -40,7 +40,7 @@ def is_trading_day(check_date):
 def build_url_download(date_str_yymmdd):
   
     # Constrói a URL de download para a data especificada.
-    return f"https://www.b3.com.br/pesquisapregao/download?filelist=PR{date_str_yymmdd}.zip"
+    return f"https://www.b3.com.br/pesquisapregao/download?filelist=SPRE{date_str_yymmdd}.zip"
 
 def try_http_download(url):
     """
@@ -109,14 +109,14 @@ def run(date_to_process: datetime):
     # 3) Extrair os arquivos do zip
     try:
         extract_path_1 = f"pregao_{dt_str}"
-        extract_path_2 = f"PR{dt_str}"
+        extract_path_2 = f"SPRE{dt_str}"
         
         # Extrai o primeiro ZIP
         with zipfile.ZipFile(zip_path, "r") as zf:
             zf.extractall(extract_path_1)
 
         # O arquivo da B3 é um ZIP dentro de outro ZIP
-        nested_zip_path = os.path.join(extract_path_1, f"PR{dt_str}.zip")
+        nested_zip_path = os.path.join(extract_path_1, f"SPRE{dt_str}.zip")
         with zipfile.ZipFile(nested_zip_path, "r") as zf:
             zf.extractall(extract_path_2)
 
