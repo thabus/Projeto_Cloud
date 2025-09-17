@@ -135,7 +135,7 @@ O principal objetivo é criar uma arquitetura de nuvem robusta e automatizada. O
 
 ### 3.2. Diagrama de Classes
 
-![Diagrama de Classes do Projeto](https://github.com/thabus/Projeto_Cloud/blob/main/diagrama_de_classes.png)
+![Diagrama de Classes do Projeto](https://github.com/thabus/Projeto_Cloud/blob/main/imagens/diagrama_de_classes.png)
 
 ### 3.3 Detalhamento dos Componentes e Relacionamentos do Diagrama
 
@@ -181,7 +181,7 @@ Adicionalmente, o **Logic Apps** é utilizado para automatizar notificações e 
 ### 5.1. Diagrama do Pipeline de Dados na Azure
 Este diagrama visualiza a arquitetura do pipeline de dados, detalhando o fluxo de informações entre os principais serviços da Microsoft Azure e os componentes do projeto. Ele representa a jornada dos dados, desde a ingestão simulada até a carga final para análise.
 
-![Diagrama de Arquitetura do Pipeline de Dados para Análise de Cotações da B3 com Azure](https://github.com/thabus/Projeto_Cloud/blob/main/Arquitetura_do_Pipeline_B3_no_Azure.png?raw=true)
+![Diagrama de Arquitetura do Pipeline de Dados para Análise de Cotações da B3 com Azure](https://github.com/thabus/Projeto_Cloud/blob/main/imagens/Arquitetura_do_Pipeline_B3_no_Azure.png?raw=true)
 
 ### 5.2. Detalhamento do Fluxo de Dados
 A seguir, detalhamos cada etapa do fluxo apresentado no diagrama:
