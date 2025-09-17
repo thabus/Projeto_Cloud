@@ -203,4 +203,4 @@ A seguir, detalhamos cada etapa do fluxo apresentado no diagrama:
 
 <br>
 
-<h4>Grupo: Thaís Bustamante e Emilly Fernandes</h4>
+<h4>Grupo: Thaís Bustamante, Emilly Fernandes e João Gabriel Rodriguez</h4>
