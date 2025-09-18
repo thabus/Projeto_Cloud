@@ -4,9 +4,10 @@ import zipfile
 import random
 import logging
 from datetime import datetime
-from helpers import yymmdd 
+from .helpers import yymmdd 
 import pandas_market_calendars as mcal
 import time
+from .azure_storage import save_file_to_blob
 
 
 # 1. Configuração de Logging para melhor diagnóstico
@@ -108,12 +109,13 @@ def run(date_to_process: datetime):
 
     # 3) Extrair os arquivos do zip
     try:
-        extract_path_1 = f"pregao_{dt_str}"
-        extract_path_2 = f"SPRE{dt_str}"
+        extract_path_1 = os.path.join(PATH_TO_SAVE, f"pregao_{dt_str}")
+        extract_path_2 = os.path.join(PATH_TO_SAVE, f"SPRE{dt_str}")
         
         # Extrai o primeiro ZIP
         with zipfile.ZipFile(zip_path, "r") as zf:
             zf.extractall(extract_path_1)
+
 
         # O arquivo da B3 é um ZIP dentro de outro ZIP
         nested_zip_path = os.path.join(extract_path_1, f"SPRE{dt_str}.zip")
@@ -125,6 +127,27 @@ def run(date_to_process: datetime):
         logging.error(f"O arquivo {zip_path} não é um ZIP válido ou está corrompido.")
     except Exception as e:
         logging.error(f"Ocorreu um erro inesperado ao extrair os arquivos: {e}")
+
+
+    try:
+        logging.info("Iniciando upload para o Azure Blob Storage...")
+        arquivos = [f for f in os.listdir(extract_path_2) if os.path.isfile(os.path.join(extract_path_2, f))]
+
+        if not arquivos:
+            logging.warning(f"Nenhum arquivo encontrado em {extract_path_2} para fazer upload.")
+            return
+
+        for arquivo in arquivos:
+            local_path = os.path.join(extract_path_2, arquivo)
+            logging.info(f"Subindo arquivo para o Azure Blob Storage: {arquivo}")
+            save_file_to_blob(arquivo, local_path)
+        
+        logging.info("Upload para o Azure Blob Storage concluído com sucesso.")
+
+    except FileNotFoundError:
+        logging.error(f"Diretório de extração não encontrado: {extract_path_2}. Upload cancelado.")
+    except Exception as e:
+        logging.error(f"Ocorreu um erro durante o upload para o Azure: {e}")
 
 
 if __name__ == "__main__":
