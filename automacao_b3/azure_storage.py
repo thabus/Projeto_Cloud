@@ -1,6 +1,6 @@
 from azure.storage.blob import BlobServiceClient
 
-AZURE_BLOB_CONNECTION = "UseDevelopmentStorage=true"
+AZURE_BLOB_CONNECTION = "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://host.docker.internal:10000/devstoreaccount1;"
 BLOB_CONTAINER_NAME = "dados-pegrao-b3"
 
 def save_file_to_blob(file_name, local_path_file):

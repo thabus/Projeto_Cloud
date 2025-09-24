@@ -8,7 +8,7 @@ from .helpers import yymmdd
 import pandas_market_calendars as mcal
 import time
 from .azure_storage import save_file_to_blob
-
+import shutil
 
 # 1. Configuração de Logging para melhor diagnóstico
 logging.basicConfig(
@@ -69,12 +69,12 @@ def try_http_download(url):
     return None, None
 
 def run(date_to_process: datetime):
-    
-    # 6. Adicionada verificação de dia útil
-    #  Executa o processo de extração para uma data específica, com lógica de retentativa.
+    """
+    Executa o processo de extração para uma data específica, com lógica de retentativa.
+    """
     if not is_trading_day(date_to_process.date()):
-            logging.info(f"Data {date_to_process.strftime('%Y-%m-%d')} não é um dia de pregão na B3. Abortando.")
-            return
+        logging.info(f"Data {date_to_process.strftime('%Y-%m-%d')} não é um dia de pregão na B3. Abortando.")
+        return
 
     dt_str = yymmdd(date_to_process)
     url_to_download = build_url_download(dt_str)
@@ -91,7 +91,7 @@ def run(date_to_process: datetime):
 
         if zip_bytes:
             logging.info(f"Arquivo de cotações baixado com sucesso: {zip_name}")
-            break  
+            break
         
         if attempt < max_retries - 1:
             logging.warning(f"Falha ao baixar. Próxima tentativa em {retry_delay_seconds / 60} minutos.")
@@ -116,7 +116,6 @@ def run(date_to_process: datetime):
         with zipfile.ZipFile(zip_path, "r") as zf:
             zf.extractall(extract_path_1)
 
-
         # O arquivo da B3 é um ZIP dentro de outro ZIP
         nested_zip_path = os.path.join(extract_path_1, f"SPRE{dt_str}.zip")
         with zipfile.ZipFile(nested_zip_path, "r") as zf:
@@ -128,7 +127,7 @@ def run(date_to_process: datetime):
     except Exception as e:
         logging.error(f"Ocorreu um erro inesperado ao extrair os arquivos: {e}")
 
-
+    # 4) Fazer upload e Limpar
     try:
         logging.info("Iniciando upload para o Azure Blob Storage...")
         arquivos = [f for f in os.listdir(extract_path_2) if os.path.isfile(os.path.join(extract_path_2, f))]
@@ -149,11 +148,10 @@ def run(date_to_process: datetime):
     except Exception as e:
         logging.error(f"Ocorreu um erro durante o upload para o Azure: {e}")
 
-
 if __name__ == "__main__":
     # 7. O script pode ser facilmente executado para qualquer data
-    data_alvo = datetime.now()
-    # data = datetime(2025, 8, 13)   # para testar 
+    #data_alvo = datetime.now()
+    data_alvo = datetime(2025, 9, 22)   # para testar 
 
     logging.info(f"--- Iniciando pipeline de extração para a data: {data_alvo.strftime('%Y-%m-%d')} ---")
     run(data_alvo)
