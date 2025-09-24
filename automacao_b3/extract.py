@@ -152,9 +152,9 @@ def run(date_to_process: datetime):
 
 if __name__ == "__main__":
     # 7. O script pode ser facilmente executado para qualquer data
-    data_alvo = datetime.now()
-    # data = datetime(2025, 8, 13)   # para testar 
+    # data_alvo = datetime.now()
+    data = datetime(2025, 9, 23)   # para testar 
 
-    logging.info(f"--- Iniciando pipeline de extração para a data: {data_alvo.strftime('%Y-%m-%d')} ---")
-    run(data_alvo)
+    logging.info(f"--- Iniciando pipeline de extração para a data: {data.strftime('%Y-%m-%d')} ---")
+    run(data)
     logging.info("--- Pipeline de extração finalizado. ---")
