@@ -1,7 +1,7 @@
 from azure.storage.blob import BlobServiceClient
 
 AZURE_BLOB_CONNECTION = "UseDevelopmentStorage=true"
-BLOB_CONTAINER_NAME = "dados_pegrao_b3"
+BLOB_CONTAINER_NAME = "dados-pegrao-b3"
 
 def save_file_to_blob(file_name, local_path_file):
     

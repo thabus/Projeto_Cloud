@@ -12,4 +12,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # 5. Comando de Execução
-CMD ["python", "automacao_b3/extract.py"]
+CMD ["python", "-m", "automacao_b3.extract"]
