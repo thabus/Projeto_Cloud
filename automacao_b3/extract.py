@@ -4,10 +4,9 @@ import zipfile
 import random
 import logging
 from datetime import datetime
-from .helpers import yymmdd 
 import pandas_market_calendars as mcal
 import time
-from .azure_storage import save_file_to_blob
+from azure_storage import save_file_to_blob
 
 
 # 1. Configuração de Logging para melhor diagnóstico
@@ -67,6 +66,10 @@ def try_http_download(url):
         logging.error(f"Exceção de rede ao acessar a URL {url}: {e}")
 
     return None, None
+
+def yymmdd(dt: datetime):
+    """Retorna a data no formato YYMMDD."""
+    return dt.strftime("%y%m%d")
 
 def run(date_to_process: datetime):
     
