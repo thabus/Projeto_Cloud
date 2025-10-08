@@ -1,28 +1,26 @@
 import io
 import logging
 import psycopg2
-from datetime import datetime
+import os # NOVO: importado para ler variáveis de ambiente
 from psycopg2.extras import execute_values
-from .azure_storage import get_db_connection, get_container_client
+from .azure_storage import get_file_from_blob
 from lxml import etree
 
-DB_NAME = "postgres"
+# --- CONFIGURAÇÕES DO BANCO DE DADOS POSTGRESQL ---
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME", "postgres")
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD") # A senha virá do ambiente
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def find_file_for_date(container_client, target_date: datetime):
-    """Procura no contêiner do Azurite por um arquivo que contenha a data alvo no nome."""
-    date_str_yyyymmdd = target_date.strftime("%Y%m%d")
-    logging.info(f"Procurando por arquivo com a data {date_str_yyyymmdd} no Azurite...")
-
-    blob_list = container_client.list_blobs()
-    for blob in blob_list:
-        if date_str_yyyymmdd in blob.name:
-            logging.info(f"Arquivo encontrado: {blob.name}")
-            return blob.name
-            
-    logging.error(f"Nenhum arquivo encontrado para a data {target_date.strftime('%Y-%m-%d')}.")
-    return None
+def get_db_connection():
+    if not DB_PASSWORD:
+        raise ValueError("A variável de ambiente DB_PASSWORD não foi definida.")
+    return psycopg2.connect(
+        host=DB_HOST, port=DB_PORT, dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD
+    )
 
 def setup_database():
     conn = get_db_connection()
@@ -36,45 +34,30 @@ def setup_database():
     conn.commit()
     cursor.close()
     conn.close()
-    logging.info(f"Banco de dados '{DB_NAME}' e tabela 'negociacoes' prontos.")
 
 def insert_stocks_data(stocks_data):
-    if not stocks_data:
-        logging.warning("Nenhum dado para inserir no banco de dados.")
-        return
-        
+    if not stocks_data: return
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        cursor.execute('DELETE FROM negociacoes')
+        cursor.execute('DELETE FROM negociacoes') # ATENÇÃO: Limpa a tabela antes de inserir.
         execute_values(cursor, 
             'INSERT INTO negociacoes (ticker, trade_date, open_price, min_price, max_price, close_price) VALUES %s',
             stocks_data
         )
         conn.commit()
-        logging.info(f"{len(stocks_data)} registros inseridos com sucesso no banco de dados.")
-    except Exception as e:
-        logging.error(f"Erro ao inserir dados no banco: {e}")
-        conn.rollback()
+        logging.info(f"{len(stocks_data)} registros inseridos com sucesso.")
     finally:
         cursor.close()
         conn.close()
 
-def transform_and_load(target_date: datetime):
+# MODIFICAÇÃO: A função agora recebe o nome do arquivo como parâmetro
+def transform_and_load(xml_filename: str):
     setup_database()
-    
-    container_client = get_container_client()
-    file_name_in_azure = find_file_for_date(container_client, target_date)
-
-    if not file_name_in_azure:
-        return
-
-    try:
-        logging.info(f"Baixando o arquivo '{file_name_in_azure}' do Azurite...")
-        blob_client = container_client.get_blob_client(file_name_in_azure)
-        xml_content = blob_client.download_blob().readall().decode('utf-8')
-    except Exception as e:
-        logging.error(f"Não foi possível obter o conteúdo do arquivo '{file_name_in_azure}'. Erro: {e}")
+    logging.info(f"Baixando o arquivo '{xml_filename}' do Azurite...")
+    xml_content = get_file_from_blob(xml_filename)
+    if not xml_content:
+        logging.error("Não foi possível obter o conteúdo do arquivo. Abortando.")
         return
     
     xml_bytes = io.BytesIO(xml_content.encode('utf-8'))
@@ -93,9 +76,7 @@ def transform_and_load(target_date: datetime):
         ticker = tckr_symb_elem.text
 
         if not (5 <= len(ticker) <= 6):
-            elem.clear()
-            while elem.getprevious() is not None: del elem.getparent()[0]
-            continue
+            elem.clear(); continue
         
         trade_date_elem = elem.find('bvmf:TradDt/bvmf:Dt', ns)
         trade_date = trade_date_elem.text if trade_date_elem is not None else None
@@ -104,29 +85,22 @@ def transform_and_load(target_date: datetime):
         if fin_instrm_attrbts is None: continue
 
         opng_pric_elem = fin_instrm_attrbts.find('bvmf:FrstPric', ns)
-        open_price = float(opng_pric_elem.text) if opng_pric_elem is not None and opng_pric_elem.text is not None else None
+        open_price = opng_pric_elem.text if opng_pric_elem is not None else None
 
         min_pric_elem = fin_instrm_attrbts.find('bvmf:MinPric', ns)
-        min_price = float(min_pric_elem.text) if min_pric_elem is not None and min_pric_elem.text is not None else None
+        min_price = min_pric_elem.text if min_pric_elem is not None else None
 
         max_pric_elem = fin_instrm_attrbts.find('bvmf:MaxPric', ns)
-        max_price = float(max_pric_elem.text) if max_pric_elem is not None and max_pric_elem.text is not None else None
+        max_price = max_pric_elem.text if max_pric_elem is not None else None
 
         clsg_pric_elem = fin_instrm_attrbts.find('bvmf:LastPric', ns)
-        close_price = float(clsg_pric_elem.text) if clsg_pric_elem is not None and clsg_pric_elem.text is not None else None
+        close_price = clsg_pric_elem.text if clsg_pric_elem is not None else None
         
         if ticker:
             filtered_stocks.append((ticker, trade_date, open_price, min_price, max_price, close_price))
 
         elem.clear()
-        while elem.getprevious() is not None: del elem.getparent()[0]
 
     logging.info("Extração e filtragem finalizadas.")
     insert_stocks_data(filtered_stocks)
     logging.info("Processo de transformação e carga concluído.")
-
-if __name__ == "__main__":
-    # --- PONTO DE ALTERAÇÃO ---
-    # Para testar, vamos usar a data de ontem (07/10)
-    data_alvo = datetime(2025, 10, 7)
-    transform_and_load(data_alvo)
