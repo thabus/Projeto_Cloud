@@ -7,7 +7,8 @@ from datetime import datetime
 import pandas_market_calendars as mcal
 import time
 
-from azure_storage import save_file_to_blob
+from .azure_storage import save_file_to_blob
+from .helpers import yymmdd
 import shutil
 
 # 1. Configuração de Logging para melhor diagnóstico
@@ -155,7 +156,7 @@ def yymmdd(dt: datetime):
 if __name__ == "__main__":
     # 7. O script pode ser facilmente executado para qualquer data
     #data_alvo = datetime.now()
-    data_alvo = datetime(2025, 9, 22)   # para testar 
+    data_alvo = datetime(2025, 9, 24)
 
     logging.info(f"--- Iniciando pipeline de extração para a data: {data_alvo.strftime('%Y-%m-%d')} ---")
     run(data_alvo)
