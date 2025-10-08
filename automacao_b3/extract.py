@@ -156,7 +156,7 @@ def yymmdd(dt: datetime):
 if __name__ == "__main__":
     # 7. O script pode ser facilmente executado para qualquer data
     #data_alvo = datetime.now()
-    data_alvo = datetime(2025, 9, 24)
+    data_alvo = datetime(2025, 10, 7)
 
     logging.info(f"--- Iniciando pipeline de extração para a data: {data_alvo.strftime('%Y-%m-%d')} ---")
     run(data_alvo)

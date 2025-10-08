@@ -1,32 +1,30 @@
-# automacao_b3/transform_load.py (VERSÃO FINAL PARA POSTGRESQL)
-
 import io
 import logging
 import psycopg2
+from datetime import datetime
 from psycopg2.extras import execute_values
-from .azure_storage import get_file_from_blob
+from .azure_storage import get_db_connection, get_container_client
 from lxml import etree
 
-# --- Configurações ---
-FILE_NAME_IN_AZURE = "BVBG.186.01_BV000471202509240001000061923366930.xml" 
-
-# --- CONFIGURAÇÕES DO BANCO DE DADOS POSTGRESQL ---
-DB_HOST = "localhost"
-DB_PORT = "5432"
 DB_NAME = "postgres"
-DB_USER = "postgres"
-DB_PASSWORD = "admin"
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def get_db_connection():
-    """Cria e retorna uma nova conexão com o banco de dados."""
-    return psycopg2.connect(
-        host=DB_HOST, port=DB_PORT, dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD
-    )
+def find_file_for_date(container_client, target_date: datetime):
+    """Procura no contêiner do Azurite por um arquivo que contenha a data alvo no nome."""
+    date_str_yyyymmdd = target_date.strftime("%Y%m%d")
+    logging.info(f"Procurando por arquivo com a data {date_str_yyyymmdd} no Azurite...")
+
+    blob_list = container_client.list_blobs()
+    for blob in blob_list:
+        if date_str_yyyymmdd in blob.name:
+            logging.info(f"Arquivo encontrado: {blob.name}")
+            return blob.name
+            
+    logging.error(f"Nenhum arquivo encontrado para a data {target_date.strftime('%Y-%m-%d')}.")
+    return None
 
 def setup_database():
-    """Cria a tabela de negociações se ela não existir."""
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
@@ -41,7 +39,6 @@ def setup_database():
     logging.info(f"Banco de dados '{DB_NAME}' e tabela 'negociacoes' prontos.")
 
 def insert_stocks_data(stocks_data):
-    """Insere uma lista de dados de ações no banco de dados de forma eficiente."""
     if not stocks_data:
         logging.warning("Nenhum dado para inserir no banco de dados.")
         return
@@ -63,12 +60,21 @@ def insert_stocks_data(stocks_data):
         cursor.close()
         conn.close()
 
-def transform_and_load():
+def transform_and_load(target_date: datetime):
     setup_database()
-    logging.info(f"Baixando o arquivo '{FILE_NAME_IN_AZURE}' do Azurite...")
-    xml_content = get_file_from_blob(FILE_NAME_IN_AZURE)
-    if not xml_content:
-        logging.error("Não foi possível obter o conteúdo do arquivo. Abortando.")
+    
+    container_client = get_container_client()
+    file_name_in_azure = find_file_for_date(container_client, target_date)
+
+    if not file_name_in_azure:
+        return
+
+    try:
+        logging.info(f"Baixando o arquivo '{file_name_in_azure}' do Azurite...")
+        blob_client = container_client.get_blob_client(file_name_in_azure)
+        xml_content = blob_client.download_blob().readall().decode('utf-8')
+    except Exception as e:
+        logging.error(f"Não foi possível obter o conteúdo do arquivo '{file_name_in_azure}'. Erro: {e}")
         return
     
     xml_bytes = io.BytesIO(xml_content.encode('utf-8'))
@@ -86,14 +92,11 @@ def transform_and_load():
         if tckr_symb_elem is None or tckr_symb_elem.text is None: continue
         ticker = tckr_symb_elem.text
 
-        # --- O FILTRO CORRETO E FUNCIONAL ---
-        # Filtra pelo tamanho do ticker para pegar apenas o mercado à vista (padrão e fracionário)
         if not (5 <= len(ticker) <= 6):
             elem.clear()
             while elem.getprevious() is not None: del elem.getparent()[0]
             continue
         
-        # --- ETAPA DE EXTRAÇÃO (só para os que passaram no filtro) ---
         trade_date_elem = elem.find('bvmf:TradDt/bvmf:Dt', ns)
         trade_date = trade_date_elem.text if trade_date_elem is not None else None
 
@@ -123,4 +126,7 @@ def transform_and_load():
     logging.info("Processo de transformação e carga concluído.")
 
 if __name__ == "__main__":
-    transform_and_load()
+    # --- PONTO DE ALTERAÇÃO ---
+    # Para testar, vamos usar a data de ontem (07/10)
+    data_alvo = datetime(2025, 10, 7)
+    transform_and_load(data_alvo)
