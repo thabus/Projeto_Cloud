@@ -1,7 +1,7 @@
 import io
 import logging
 import psycopg2
-import os # NOVO: importado para ler variáveis de ambiente
+import os
 from psycopg2.extras import execute_values
 from .azure_storage import get_file_from_blob
 from lxml import etree
@@ -16,6 +16,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD") # A senha virá do ambiente
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def get_db_connection():
+    """Cria e retorna uma conexão com o banco de dados PostgreSQL."""
     if not DB_PASSWORD:
         raise ValueError("A variável de ambiente DB_PASSWORD não foi definida.")
     return psycopg2.connect(
@@ -23,6 +24,7 @@ def get_db_connection():
     )
 
 def setup_database():
+    """Garante que a tabela 'negociacoes' exista no banco de dados."""
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
@@ -36,11 +38,17 @@ def setup_database():
     conn.close()
 
 def insert_stocks_data(stocks_data):
-    if not stocks_data: return
+    """Insere os dados filtrados no banco de dados, limpando os dados antigos."""
+    if not stocks_data:
+        logging.warning("Nenhum dado para inserir no banco de dados.")
+        return
+        
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        cursor.execute('DELETE FROM negociacoes') # ATENÇÃO: Limpa a tabela antes de inserir.
+        # ATENÇÃO: Limpa a tabela antes de inserir novos dados.
+        cursor.execute('DELETE FROM negociacoes') 
+        
         execute_values(cursor, 
             'INSERT INTO negociacoes (ticker, trade_date, open_price, min_price, max_price, close_price) VALUES %s',
             stocks_data
@@ -51,8 +59,12 @@ def insert_stocks_data(stocks_data):
         cursor.close()
         conn.close()
 
-# MODIFICAÇÃO: A função agora recebe o nome do arquivo como parâmetro
+
 def transform_and_load(xml_filename: str):
+    """
+    Função principal que baixa o XML, filtra os tickers de interesse
+    e carrega os dados no banco PostgreSQL.
+    """
     setup_database()
     logging.info(f"Baixando o arquivo '{xml_filename}' do Azurite...")
     xml_content = get_file_from_blob(xml_filename)
@@ -64,25 +76,37 @@ def transform_and_load(xml_filename: str):
     ns = {'bvmf': 'urn:bvmf.217.01.xsd'}
     context = etree.iterparse(xml_bytes, tag=f"{{{ns['bvmf']}}}PricRpt", huge_tree=True, events=('end',))
     
-    logging.info("Iniciando extração e filtragem...")
+    logging.info("Iniciando extração e filtragem por sufixo de Ticker...")
     filtered_stocks = []
 
+    #  Definir os sufixos válidos ---
+    VALID_SUFFIXES = ('3', '4', '5', '11', '34')
+    
     for _, elem in context:
         scty_id_elem = elem.find('bvmf:SctyId', ns)
-        if scty_id_elem is None: continue
-        
-        tckr_symb_elem = scty_id_elem.find('bvmf:TckrSymb', ns)
-        if tckr_symb_elem is None or tckr_symb_elem.text is None: continue
-        ticker = tckr_symb_elem.text
-
-        if not (5 <= len(ticker) <= 6):
+        if scty_id_elem is None: 
             elem.clear(); continue
         
+        tckr_symb_elem = scty_id_elem.find('bvmf:TckrSymb', ns)
+        if tckr_symb_elem is None or tckr_symb_elem.text is None:
+            elem.clear(); continue
+        ticker = tckr_symb_elem.text
+            
+        # 1. Ignorar Mercado Fracionário (terminado em 'F')
+        if ticker.endswith('F'):
+            elem.clear(); continue
+
+        # 2. Manter apenas os sufixos válidos (Ações, BDRs, ETFs, etc.)
+        if not ticker.endswith(VALID_SUFFIXES):
+            elem.clear(); continue
+
+        # Se passou pelo filtro, continuamos a extrair os outros dados
         trade_date_elem = elem.find('bvmf:TradDt/bvmf:Dt', ns)
         trade_date = trade_date_elem.text if trade_date_elem is not None else None
-
+        
         fin_instrm_attrbts = elem.find('bvmf:FinInstrmAttrbts', ns)
-        if fin_instrm_attrbts is None: continue
+        if fin_instrm_attrbts is None: 
+            elem.clear(); continue 
 
         opng_pric_elem = fin_instrm_attrbts.find('bvmf:FrstPric', ns)
         open_price = opng_pric_elem.text if opng_pric_elem is not None else None
@@ -99,6 +123,7 @@ def transform_and_load(xml_filename: str):
         if ticker:
             filtered_stocks.append((ticker, trade_date, open_price, min_price, max_price, close_price))
 
+        # Limpa o elemento da memória para não sobrecarregar
         elem.clear()
 
     logging.info("Extração e filtragem finalizadas.")
