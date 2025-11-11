@@ -6,12 +6,14 @@ import logging
 from datetime import datetime
 import pandas_market_calendars as mcal
 import time
+import tempfile
 
 from .azure_storage import save_file_to_blob
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
-PATH_TO_SAVE = os.getenv("PATH_TO_SAVE_B3_DATA", "./dados_b3")
+# USA A PASTA TEMPORÁRIA DO AZURE (QUE TEM PERMISSÃO DE ESCRITA)
+PATH_TO_SAVE = os.path.join(tempfile.gettempdir(), "dados_b3")
 USER_AGENTS = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36'

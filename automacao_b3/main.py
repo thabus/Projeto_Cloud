@@ -10,8 +10,8 @@ def run_pipeline():
     Orquestra a execução do pipeline de ponta a ponta.
     """
   
-    # data_alvo = datetime.now()
-    data_alvo = datetime(2025, 10, 23) 
+    data_alvo = datetime.now()
+    #data_alvo = datetime(2025, 11, 10) 
     
     logging.info(f"--- INICIANDO PIPELINE COMPLETO PARA A DATA: {data_alvo.strftime('%Y-%m-%d')} ---")
     
