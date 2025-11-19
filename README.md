@@ -191,7 +191,7 @@ O Frontend Web é o componente de consumo final do projeto, garantindo a visuali
 * **Tecnologia:** O frontend é uma aplicação **React** e reside na pasta `frontend-b3`.
 * **Função:** Sua principal função é estabelecer uma interface de usuário para acessar os dados ( via API, que acessa o Azure SQL Database) e exibir visualizações e gráficos gerados a partir da tabela `Cotacoes`.
 * **Deploy Cloud:** O Frontend é um aplicativo web **hospedado na nuvem Azure**, garantindo que todo o sistema, da ingestão à apresentação, opere na mesma plataforma.
-
+* **Disponível para visualização:** https://yellow-wave-06ddd4f0f.3.azurestaticapps.net/
   ---
 
 **Grupo:** Thaís Bustamante, Emilly Fernandes e João Gabriel Rodriguez
