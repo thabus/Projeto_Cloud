@@ -46,8 +46,6 @@ def insert_stocks_data(stocks_data):
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        # ATENÇÃO: Limpa a tabela antes de inserir novos dados.
-        cursor.execute('DELETE FROM negociacoes') 
         
         execute_values(cursor, 
             'INSERT INTO negociacoes (ticker, trade_date, open_price, min_price, max_price, close_price) VALUES %s',
