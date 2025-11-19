@@ -27,30 +27,11 @@ function DashboardAtivos() {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Box sx={{
-        mt: 4,
-        width: '100%',
-        display: "flex",
-        justifyContent: "center"
-      }}>
-        <Paper
-          sx={{
-            p: 4,
-            width: "1200px", // Largura fixa centralizada, igual dashboard B3
-            boxShadow: 3,
-            background: "#fff"
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              gap: 4,
-              alignItems: "flex-start",
-              width: "100%",
-              justifyContent: "stretch"
-            }}
-          >
-            <Box sx={{ flex: 3 }}>
+      <Box sx={{ mt: 4, width: '100%', display: "flex", justifyContent: "center" }}>
+        <Paper sx={{ p: 4, width: "1200px", boxShadow: 3, background: "#fff" }}>
+          <Box sx={{ display: "flex", gap: 4, alignItems: "flex-start", width: "100%", justifyContent: "stretch", flexWrap: "wrap" }}>
+            
+            <Box sx={{ flex: 3, minWidth: '500px' }}>
               <TabelaAcoes
                 onFiltro={() => { }}
                 filtro={filtro}
@@ -58,8 +39,31 @@ function DashboardAtivos() {
                 dados={dadosFiltrados}
               />
             </Box>
+
             <Box sx={{ flex: 2, minWidth: 360 }}>
-              <GraficoAcoes dados={dadosFiltrados} />
+              {/* PROTEÇÃO: Se tiver mais de 200 pontos, NÃO desenha o gráfico para não travar */}
+              {dadosFiltrados.length > 0 && dadosFiltrados.length < 200 ? (
+                <Paper elevation={3} sx={{ p: 2, width: '100%', height: 400 }}>
+                    <GraficoAcoes dados={dadosFiltrados} />
+                </Paper>
+              ) : (
+                <Paper 
+                  elevation={0} 
+                  variant="outlined" 
+                  sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#f5f5f5', p: 3, textAlign: 'center' }}
+                >
+                  <Box>
+                    <Typography variant="h6" color="textSecondary" gutterBottom>
+                        Gráfico Indisponível
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                        {dadosFiltrados.length > 200 
+                        ? "Muitos dados para exibir no gráfico. Filtre por um ativo específico." 
+                        : "Nenhum dado encontrado."}
+                    </Typography>
+                  </Box>
+                </Paper>
+              )}
             </Box>
           </Box>
         </Paper>
